@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "module": "commonjs",
+        "declaration": true,
+        "declarationMap": false,
+        "sourceMap": true,
+        "inlineSources": true,
+        "strict": true,
+        "noEmitOnError": true,
+        "importHelpers": true
+    }
+}

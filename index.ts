@@ -165,6 +165,9 @@ export interface Equaler<T> {
     hash(x: T): number;
 }
 
+export type EqualityComparison<T> = (x: T, y: T) => boolean;
+export type HashGenerator<T> = (x: T) => number;
+
 export namespace Equaler {
     /**
      * Gets the default `Equaler`.
@@ -195,6 +198,13 @@ export namespace Equaler {
             return defaultEqualer.hash(x);
         }
     };
+
+    /**
+     * Creates an `Equaler` from a comparison function and an optional hash generator.
+     */
+    export function create<T>(equalityComparison: EqualityComparison<T>, hashGenerator: HashGenerator<T> = defaultEqualer.hash): Equaler<T> {
+        return { equals: equalityComparison, hash: hashGenerator };
+    }
 }
 
 export type Comparison<T> = (x: T, y: T) => number;

@@ -28,7 +28,7 @@ const clean = () => del([
 const build = () => gulp.src(["*.ts", "internal/**/*.ts"], { base: "." })
     .pipe(sourcemaps.init())
     .pipe(proj())
-    .pipe(sourcemaps.write(".", { includeContent: false, destPath: "." }))
+    .pipe(sourcemaps.write(".", { includeContent: true, destPath: "." }))
     .pipe(gulp.dest("."));
 const test = () => spawn('node', [require.resolve("jest/bin/jest")], { stdio: "inherit" });
 const watch = () => spawn('node', [require.resolve("jest/bin/jest"), "--watch"], { stdio: "inherit" });

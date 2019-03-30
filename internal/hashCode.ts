@@ -40,7 +40,7 @@ let bigIntSeed = defaultBigIntSeed;
 let localSymbolSeed = defaultLocalSymbolSeed;
 let globalSymbolSeed = defaultGlobalSymbolSeed;
 
-function hashBoolean(x: boolean) {
+/*@internal*/ export function hashBoolean(x: boolean) {
     return x ? 1 : 0;
 }
 
@@ -69,7 +69,7 @@ function hashFloat64(x: number) {
     return float64View.getInt32(0, /*littleEndian*/ true) ^ float64View.getInt32(4, /*littleEndian*/ true);
 }
 
-function hashNumber(x: number) {
+/*@internal*/ export function hashNumber(x: number) {
     return isInt32(x) ? hashInt32(x) :
         isUint32(x) ? hashUint32(x) :
         hashFloat64(x);
@@ -84,7 +84,7 @@ function hashStringWithSeed(x: string, encoding: string, seed: number) {
     return hashBuffer(Buffer.from(x, encoding), seed);
 }
 
-function combineHashes(x: number, y: number) {
+/*@internal*/ export function combineHashes(x: number, y: number) {
     return ((x << 7) | (x >>> 25)) ^ y;
 }
 
@@ -112,9 +112,9 @@ function getPseudoBigIntHasher() {
     return hashBigInt;
 }
 
-const hashBigInt = typeof BigInt === "function" ? getRealBigIntHasher() : getPseudoBigIntHasher();
+/*@internal*/ export const hashBigInt = typeof BigInt === "function" ? getRealBigIntHasher() : getPseudoBigIntHasher();
 
-function hashString(x: string) {
+/*@internal*/ export function hashString(x: string) {
     return hashStringWithSeed(x, "utf8", stringSeed);
 }
 
@@ -140,7 +140,7 @@ function hashLocalSymbol(symbol: symbol) {
     return hash;
 }
 
-function hashSymbol(x: symbol) {
+/*@internal*/ export function hashSymbol(x: symbol) {
     const key = Symbol.keyFor(x);
     return key !== undefined ? hashGlobalSymbol(x, key) : hashLocalSymbol(x);
 }
@@ -160,7 +160,7 @@ function getPrototypeCounter(prototype: object | null) {
     return counter;
 }
 
-function hashObject(x: object) {
+/*@internal*/ export function hashObject(x: object) {
     let hash = weakObjectHashes && weakObjectHashes.get(x);
     if (hash === undefined) {
         if (!weakObjectHashes) weakObjectHashes = new WeakMap();
@@ -171,8 +171,7 @@ function hashObject(x: object) {
     return hash;
 }
 
-/*@internal*/
-export function getHashCode(x: unknown) {
+/*@internal*/ export function hashUnknown(x: unknown) {
     switch (typeof x) {
         case "boolean": return hashBoolean(x);
         case "number": return hashNumber(x);
@@ -189,7 +188,7 @@ export function getHashCode(x: unknown) {
     }
 }
 
-getHashCode.getState = () => ({
+hashUnknown.getState = () => ({
     weakPrototypeCounters,
     nullPrototypeCounter,
     localSymbolCounter,
@@ -203,7 +202,7 @@ getHashCode.getState = () => ({
     globalSymbolSeed
 });
 
-getHashCode.setState = (state: Partial<ReturnType<typeof getHashCode["getState"]>>) => ({
+hashUnknown.setState = (state: Partial<ReturnType<typeof hashUnknown["getState"]>>) => ({
     weakPrototypeCounters,
     nullPrototypeCounter,
     localSymbolCounter,

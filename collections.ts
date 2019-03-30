@@ -49,8 +49,9 @@ import { Comparison, Comparer, Equaler } from "./index";
 import { isIterable, maxInt32 } from './internal/utils';
 import { binarySearch } from './internal/binarySearch';
 import { getPrime, expandPrime } from './internal/primes';
+import { KeyedCollection, Collection } from "collection-core";
 
-export class SortedMap<K, V> {
+export class SortedMap<K, V> implements KeyedCollection<K, V> {
     private _keys: K[] = [];
     private _values: V[] = [];
     private _comparer: Comparer<K>;
@@ -144,6 +145,15 @@ export class SortedMap<K, V> {
     }
 
     [Symbol.toStringTag]: string;
+
+    get [KeyedCollection.size]() { return this.size; }
+    [KeyedCollection.has](key: K) { return this.has(key); }
+    [KeyedCollection.get](key: K) { return this.get(key); }
+    [KeyedCollection.set](key: K, value: V) { this.set(key, value); }
+    [KeyedCollection.delete](key: K) { return this.delete(key); }
+    [KeyedCollection.clear]() { this.clear(); }
+    [KeyedCollection.keys]() { return this.keys(); }
+    [KeyedCollection.values]() { return this.values(); }
 }
 
 Object.defineProperty(SortedMap, Symbol.toStringTag, {
@@ -153,7 +163,7 @@ Object.defineProperty(SortedMap, Symbol.toStringTag, {
     value: "SortedMap"
 });
 
-export class SortedSet<T> {
+export class SortedSet<T> implements Collection<T> {
     private _values: T[] = [];
     private _comparer: Comparer<T>;
 
@@ -238,6 +248,12 @@ export class SortedSet<T> {
     }
 
     [Symbol.toStringTag]: string;
+
+    get [Collection.size]() { return this.size; }
+    [Collection.has](value: T) { return this.has(value); }
+    [Collection.add](value: T) { this.add(value); }
+    [Collection.delete](value: T) { return this.delete(value); }
+    [Collection.clear]() { this.clear(); }
 }
 
 Object.defineProperty(SortedSet, Symbol.toStringTag, {
@@ -526,7 +542,7 @@ function forEachEntry<K, V, T>(source: T, head: HashEntry<K, V>, callback: (valu
     }
 }
 
-export class HashMap<K, V> {
+export class HashMap<K, V> implements KeyedCollection<K, V> {
     private _hashData: HashData<K, V>;
 
     constructor(equaler?: Equaler<K>);
@@ -620,6 +636,15 @@ export class HashMap<K, V> {
     }
 
     [Symbol.toStringTag]: string;
+
+    get [KeyedCollection.size]() { return this.size; }
+    [KeyedCollection.has](key: K) { return this.has(key); }
+    [KeyedCollection.get](key: K) { return this.get(key); }
+    [KeyedCollection.set](key: K, value: V) { this.set(key, value); }
+    [KeyedCollection.delete](key: K) { return this.delete(key); }
+    [KeyedCollection.clear]() { this.clear(); }
+    [KeyedCollection.keys]() { return this.keys(); }
+    [KeyedCollection.values]() { return this.values(); }
 }
 
 Object.defineProperty(HashMap, Symbol.toStringTag, {
@@ -629,7 +654,7 @@ Object.defineProperty(HashMap, Symbol.toStringTag, {
     value: "HashMap"
 });
 
-export class HashSet<T> {
+export class HashSet<T> implements Collection<T> {
     private _hashData: HashData<T,T>;
 
     constructor(equaler?: Equaler<T>);
@@ -710,7 +735,7 @@ export class HashSet<T> {
         return iterateEntries(this._hashData.head, selectEntryEntry);
     }
 
-    [Symbol.iterator](): Iterable<T> {
+    [Symbol.iterator]() {
         return this.values();
     }
 
@@ -719,6 +744,12 @@ export class HashSet<T> {
     }
 
     [Symbol.toStringTag]: string;
+
+    get [Collection.size]() { return this.size; }
+    [Collection.has](value: T) { return this.has(value); }
+    [Collection.add](value: T) { this.add(value); }
+    [Collection.delete](value: T) { return this.delete(value); }
+    [Collection.clear]() { this.clear(); }
 }
 
 Object.defineProperty(HashSet, Symbol.toStringTag, {

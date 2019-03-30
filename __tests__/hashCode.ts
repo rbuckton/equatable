@@ -1,9 +1,9 @@
-import { getHashCode } from "../internal/hashCode";
+import { hashUnknown } from "../internal/hashCode";
 
-const state = getHashCode.getState();
+const state = hashUnknown.getState();
 
 beforeEach(() => {
-    getHashCode.setState({ 
+    hashUnknown.setState({ 
         objectSeed: 0x1dc8529e,
         stringSeed: 0x6744b005,
         bigIntSeed: 0x6c9503bc,
@@ -13,24 +13,24 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-    getHashCode.setState(state);
+    hashUnknown.setState(state);
 });
 
-it("null", () => expect(getHashCode(null)).toBe(0));
-it("undefined", () => expect(getHashCode(undefined)).toBe(0));
-it("true", () => expect(getHashCode(true)).toBe(1));
-it("false", () => expect(getHashCode(false)).toBe(0));
-it("0", () => expect(getHashCode(0)).toBe(0));
-it("1", () => expect(getHashCode(1)).toBe(1));
-it("1.2", () => expect(getHashCode(1.2)).toBe(49164));
-it('""', () => expect(getHashCode("")).toBe(-293397629));
-it('"abc"', () => expect(getHashCode("abc")).toBe(38704718));
-it("123n", () => expect(getHashCode(123n)).toBe(251));
-it("{}", () => expect(getHashCode({})).toBe(-467054833));
-it("same {}", () => (obj => expect(getHashCode(obj)).toBe(getHashCode(obj)))({}));
-it("different {}", () => expect(getHashCode({})).not.toBe(getHashCode({})));
-it("symbol", () => expect(getHashCode(Symbol())).toBe(1087209661));
-it("same symbol", () => (sym => expect(getHashCode(sym)).toBe(getHashCode(sym)))(Symbol()));
-it("different symbols", () => expect(getHashCode(Symbol())).not.toBe(getHashCode(Symbol())));
-it("built-in symbol", () => expect(getHashCode(Symbol.iterator)).toBe(1087209661));
-it("symbol.for", () => expect(getHashCode(Symbol.for("foo"))).toBe(-1197376351));
+it("null", () => expect(hashUnknown(null)).toBe(0));
+it("undefined", () => expect(hashUnknown(undefined)).toBe(0));
+it("true", () => expect(hashUnknown(true)).toBe(1));
+it("false", () => expect(hashUnknown(false)).toBe(0));
+it("0", () => expect(hashUnknown(0)).toBe(0));
+it("1", () => expect(hashUnknown(1)).toBe(1));
+it("1.2", () => expect(hashUnknown(1.2)).toBe(49164));
+it('""', () => expect(hashUnknown("")).toBe(-293397629));
+it('"abc"', () => expect(hashUnknown("abc")).toBe(38704718));
+it("123n", () => expect(hashUnknown(123n)).toBe(251));
+it("{}", () => expect(hashUnknown({})).toBe(-467054833));
+it("same {}", () => (obj => expect(hashUnknown(obj)).toBe(hashUnknown(obj)))({}));
+it("different {}", () => expect(hashUnknown({})).not.toBe(hashUnknown({})));
+it("symbol", () => expect(hashUnknown(Symbol())).toBe(1087209661));
+it("same symbol", () => (sym => expect(hashUnknown(sym)).toBe(hashUnknown(sym)))(Symbol()));
+it("different symbols", () => expect(hashUnknown(Symbol())).not.toBe(hashUnknown(Symbol())));
+it("built-in symbol", () => expect(hashUnknown(Symbol.iterator)).toBe(1087209661));
+it("symbol.for", () => expect(hashUnknown(Symbol.for("foo"))).toBe(-1197376351));

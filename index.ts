@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-import { getHashCode } from './internal/hashCode';
+import { hashUnknown, combineHashes } from './internal/hashCode';
 
 /**
  * Represents a value that can compare its equality with another value.
@@ -180,7 +180,7 @@ export namespace Equaler {
         },
         hash(x) {
             if (Equatable.isEquatable(x)) return x[Equatable.hash]();
-            return getHashCode(x);
+            return hashUnknown(x);
         }
     };
 
@@ -188,14 +188,66 @@ export namespace Equaler {
      * Gets a default `Equaler` that supports `StructuralEquatable` values.
      */
     export const structuralEqualer: Equaler<unknown> = {
-        equals(x: unknown, y: unknown): boolean {
+        equals(x, y) {
             if (StructuralEquatable.isStructuralEquatable(x)) return x[StructuralEquatable.structuralEquals](y, structuralEqualer);
             if (StructuralEquatable.isStructuralEquatable(y)) return y[StructuralEquatable.structuralEquals](x, structuralEqualer);
             return defaultEqualer.equals(x, y);
         },
-        hash(x: unknown): number {
+        hash(x) {
             if (StructuralEquatable.isStructuralEquatable(x)) return x[StructuralEquatable.structuralHash](structuralEqualer);
             return defaultEqualer.hash(x);
+        }
+    };
+
+    /**
+     * An `Equaler` that compares array values rather than the arrays themselves.
+     */
+    export const tupleEqualer: Equaler<unknown[]> = {
+        equals(x, y) {
+            if (!Array.isArray(x) && x !== null && x !== undefined ||
+                !Array.isArray(y) && y !== null && y !== undefined) throw new TypeError("Array expected");
+            if (x === y) return true;
+            if (!x || !y || x.length !== y.length) return false;
+            for (let i = 0; i < x.length; i++) {
+                if (!Equaler.defaultEqualer.equals(x[0], y[0])) return false;
+            }
+            return true;
+        },
+        hash(x) {
+            if (x === null || x === undefined) return 0;
+            if (!Array.isArray(x)) throw new TypeError("Array expected");
+            let hc = 0;
+            for (const item of x) {
+                hc = combineHashes(hc, Equaler.defaultEqualer.hash(item));
+            }
+            return hc;
+        }
+    };
+
+    /**
+     * An `Equaler` that compares array values that may be `StructuralEquatable` rather than the arrays themselves.
+     */
+    export const tupleStructuralEqualer: Equaler<unknown[]> = {
+        equals(x, y) {
+            if (!Array.isArray(x) && x !== null && x !== undefined ||
+                !Array.isArray(y) && y !== null && y !== undefined) {
+                throw new TypeError("Array expected");
+            }
+            if (x === y) return true;
+            if (!x || !y || x.length !== y.length) return false;
+            for (let i = 0; i < x.length; i++) {
+                if (!Equaler.structuralEqualer.equals(x[0], y[0])) return false;
+            }
+            return true;
+        },
+        hash(x) {
+            if (x === null || x === undefined) return 0;
+            if (!Array.isArray(x)) throw new TypeError("Array expected");
+            let hc = 0;
+            for (const item of x) {
+                hc = combineHashes(hc, Equaler.structuralEqualer.hash(item));
+            }
+            return hc;
         }
     };
 
@@ -224,7 +276,7 @@ export interface Comparer<T> {
 
 export namespace Comparer {
     /**
-     * Gets the default `Comparer`.
+     * The default `Comparer`.
      */
     export const defaultComparer: Comparer<unknown> = {
         compare(x, y) {
@@ -237,13 +289,57 @@ export namespace Comparer {
     };
 
     /**
-     * Gets a default `Comparer` that supports `StructuralComparable` values.
+     * A default `Comparer` that supports `StructuralComparable` values.
      */
     export const structuralComparer: Comparer<unknown> = {
         compare(x, y) {
             if (StructuralComparable.isStructuralComparable(x)) return x[StructuralComparable.structuralCompareTo](y, structuralComparer);
             if (StructuralComparable.isStructuralComparable(y)) return -y[StructuralComparable.structuralCompareTo](x, structuralComparer);
             return defaultComparer.compare(x, y);
+        }
+    };
+
+    /**
+     * A default `Comparer` that compares array values rather than the arrays themselves.
+     */
+    export const tupleComparer: Comparer<unknown[]> = {
+        compare(x, y) {
+            if (!Array.isArray(x) && x !== null && x !== undefined ||
+                !Array.isArray(y) && y !== null && y !== undefined) {
+                throw new TypeError("Array expected");
+            }
+            let r: number;
+            if (r = defaultComparer.compare(x.length, y.length)) {
+                return r;
+            }
+            for (let i = 0; i < x.length; i++) {
+                if (r = defaultComparer.compare(x[0], y[0])) {
+                    return r;
+                }
+            }
+            return 0;
+        }
+    };
+
+    /**
+     * A default `Comparer` that compares array values that may be `StructuralComparable` rather than the arrays themselves.
+     */
+    export const tupleStructuralComparer: Comparer<unknown[]> = {
+        compare(x, y) {
+            if (!Array.isArray(x) && x !== null && x !== undefined ||
+                !Array.isArray(y) && y !== null && y !== undefined) {
+                throw new TypeError("Array expected");
+            }
+            let r: number;
+            if (r = defaultComparer.compare(x.length, y.length)) {
+                return r;
+            }
+            for (let i = 0; i < x.length; i++) {
+                if (r = structuralComparer.compare(x[0], y[0])) {
+                    return r;
+                }
+            }
+            return 0;
         }
     };
 

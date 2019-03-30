@@ -107,22 +107,11 @@ sortedSet.add(obj2);
 The global shim adds a default implementation of `Equatable` to `Object.prototype` and default implementations of 
 `Comparable` to `String.prototype`, `Number.prototype`, `Boolean.prototype`, and `BigInt.prototype`.
 
-It also adds the following values to the global scope:
-- `Equatable` (from `equatable`)
-- `Comparable` (from `equatable`)
-- `StructuralEquatable` (from `equatable`)
-- `StructuralComparable` (from `equatable`)
-- `Equaler` (from `equatable`)
-- `Comparer` (from `equatable`)
-- `SortedSet` (from `equatable/collections`)
-- `SortedMap` (from `equatable/collections`)
-- `HashSet` (from `equatable/collections`)
-- `HashMap` (from `equatable/collections`)
-
 To install the global shim, import `equatable/global`:
 
 ```ts
 import "equatable/global"; // triggers global-scope side effects
+import { Equatable } from "equatable";
 
 123[Equatable.hash]() // 123
 ```

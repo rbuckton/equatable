@@ -14,128 +14,193 @@
    limitations under the License.
 */
 
-import { getHashCode } from './internal/hashCode';
-import { Equatable, Comparable, StructuralEquatable, StructuralComparable, Equaler, Comparer } from './index';
-import { SortedSet, SortedMap, HashSet, HashMap } from './collections';
+import { hashUnknown, hashString, hashNumber, hashBigInt, hashBoolean, hashSymbol } from './internal/hashCode';
+import { Equatable, Comparable } from './index';
+
+const accessorBase: PropertyDescriptor = { enumerable: false, configurable: true };
+const methodBase: PropertyDescriptor = { ...accessorBase, writable: true };
+
+// #region Object augmentations
 
 declare global {
     interface Object {
         [Equatable.equals](other: unknown): boolean;
         [Equatable.hash](): number;
     }
-
-    interface String {
-        [Comparable.compareTo](other: unknown): number;
-    }
-
-    interface Number {
-        [Comparable.compareTo](other: unknown): number;
-    }
-
-    interface BigInt {
-        [Comparable.compareTo](other: unknown): number;
-    }
-
-    interface Boolean {
-        [Comparable.compareTo](other: unknown): number;
-    }
-
-    type Equatable = import("./index").Equatable;
-    type Comparable = import("./index").Comparable;
-    type StructuralEquatable = import("./index").StructuralEquatable;
-    type StructuralComparable = import("./index").StructuralComparable;
-    type Equaler<T> = import("./index").Equaler<T>;
-    type Comparer<T> = import("./index").Comparer<T>;
-    type Comparison<T> = import("./index").Comparison<T>;
-    type SortedSet<T> = import("./collections").SortedSet<T>;
-    type SortedMap<K, V> = import("./collections").SortedMap<K, V>;
-    type HashSet<T> = import("./collections").HashSet<T>;
-    type HashMap<K, V> = import("./collections").HashMap<K, V>;
-    
-    var Equatable: typeof import("./index").Equatable;
-    var Comparable: typeof import("./index").Comparable;
-    var StructuralEquatable: typeof import("./index").StructuralEquatable;
-    var StructuralComparable: typeof import("./index").StructuralComparable;
-    var Equaler: typeof import("./index").Equaler;
-    var Comparer: typeof import("./index").Comparer;
-    var SortedSet: typeof import("./collections").SortedSet;
-    var SortedMap: typeof import("./collections").SortedMap;
-    var HashSet: typeof import("./collections").HashSet;
-    var HashMap: typeof import("./collections").HashMap;
 }
 
-(global as any).Equatable = Equatable;
-(global as any).Comparable = Comparable;
-(global as any).StructuralEquatable = StructuralEquatable;
-(global as any).StructuralComparable = StructuralComparable;
-(global as any).Equaler = Equaler;
-(global as any).Comparer = Comparer;
-(global as any).SortedSet = SortedSet;
-(global as any).SortedMap = SortedMap;
-(global as any).HashSet = HashSet;
-(global as any).HashMap = HashMap;
-
-Object.defineProperty(Object.prototype, Equatable.equals, {
-    enumerable: false,
-    configurable: true,
-    writable: true,
-    value: function (this: unknown, other: unknown) {
-        return Object.is(this, other);
+Object.defineProperties(Object.prototype, {
+    [Equatable.equals]: {
+        ...methodBase,
+        value: function (this: unknown, other: unknown) {
+            return Object.is(this, other);
+        }
+    },
+    [Equatable.hash]: {
+        ...methodBase,
+        value: function (this: unknown) {
+            return hashUnknown(this);
+        }
     }
 });
 
-Object.defineProperty(Object.prototype, Equatable.hash, {
-    enumerable: false,
-    configurable: true,
-    writable: true,
-    value: function (this: unknown) {
-        return getHashCode(this);
+// #endregion Object augmentations
+
+// #region String augmentations
+
+declare global {
+    interface String {
+        [Equatable.equals](other: unknown): boolean;
+        [Equatable.hash](): number;
+        [Comparable.compareTo](other: unknown): number;
+    }
+}
+
+Object.defineProperties(String.prototype, {
+    [Equatable.equals]: {
+        ...methodBase,
+        value: function (this: string, other: unknown) {
+            return this === other;
+        }
+    },
+    [Equatable.hash]: {
+        ...methodBase,
+        value: function (this: string) {
+            return hashString(this);
+        }
+    },
+    [Comparable.compareTo]: {
+        ...methodBase,
+        value: function (this: string, other: unknown) {
+            const s = String(other);
+            if (this < s) return -1;
+            if (this > s) return 1;
+            return 0;
+        }
     }
 });
 
-Object.defineProperty(String.prototype, Comparable.compareTo, {
-    enumerable: true,
-    configurable: true,
-    writable: true,
-    value: function (this: string, other: unknown) {
-        const s = String(other);
-        if (this < s) return -1;
-        if (this > s) return 1;
-        return 0;
+// #endregion String augmentations
+
+// #region Symbol augmentations
+
+declare global {
+    interface Symbol {
+        [Equatable.equals](other: unknown): boolean;
+        [Equatable.hash](): number;
+    }
+}
+
+Object.defineProperties(Symbol.prototype, {
+    [Equatable.equals]: {
+        ...methodBase,
+        value: function (this: symbol, other: unknown) {
+            return this === other;
+        }
+    },
+    [Equatable.hash]: {
+        ...methodBase,
+        value: function (this: symbol) {
+            return hashSymbol(this);
+        }
     }
 });
 
-Object.defineProperty(Number.prototype, Comparable.compareTo, {
-    enumerable: true,
-    configurable: true,
-    writable: true,
-    value: function (this: number, other: unknown) {
-        return this - Number(other);
+// #endregion String augmentations
+
+// #region Number augmentations
+
+declare global {
+    interface Number extends Comparable {}
+}
+
+Object.defineProperties(Number.prototype, {
+    [Equatable.equals]: {
+        ...methodBase,
+        value: function (this: number, other: unknown) {
+            return this === other;
+        }
+    },
+    [Equatable.hash]: {
+        ...methodBase,
+        value: function (this: number) {
+            return hashNumber(this);
+        }
+    },
+    [Comparable.compareTo]: {
+        ...methodBase,
+        value: function (this: number, other: unknown) {
+            return this - Number(other);
+        }
     }
 });
+
+// #endregion Number augmentations
+
+// #region BigInt augmentations
+
+declare global {
+    interface BigInt extends Comparable {}
+}
 
 if (typeof BigInt === "function") {
-    Object.defineProperty(BigInt.prototype, Comparable.compareTo, {
-        enumerable: true,
-        configurable: true,
-        writable: true,
-        value: function (this: bigint, other: unknown) {
-            const i = BigInt(other);
-            if (this < i) return -1;
-            if (this > i) return 1;
-            return 0;
+    Object.defineProperties(BigInt.prototype, {
+        [Equatable.equals]: {
+            ...methodBase,
+            value: function (this: bigint, other: unknown) {
+                return this === other;
+            }
+        },
+        [Equatable.hash]: {
+            ...methodBase,
+            value: function (this: bigint) {
+                return hashBigInt(this);
+            }
+        },
+        [Comparable.compareTo]: {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: function (this: bigint, other: unknown) {
+                const i = BigInt(other);
+                if (this < i) return -1;
+                if (this > i) return 1;
+                return 0;
+            }
         }
     });
 }
 
-Object.defineProperty(Boolean.prototype, Comparable.compareTo, {
-    enumerable: true,
-    configurable: true,
-    writable: true,
-    value: function (this: boolean, other: unknown) {
-        const s = Boolean(other);
-        if (this < s) return -1;
-        if (this > s) return 1;
-        return 0;
+// #endregion BigInt augmentations
+
+// #region Boolean augmentations
+
+declare global {
+    interface Boolean extends Comparable {}
+}
+
+Object.defineProperties(Boolean.prototype, {
+    [Equatable.equals]: {
+        ...methodBase,
+        value: function (this: boolean, other: unknown) {
+            return this === other;
+        }
+    },
+    [Equatable.hash]: {
+        ...methodBase,
+        value: function (this: boolean) {
+            return hashBoolean(this);
+        }
+    },
+    [Comparable.compareTo]: {
+        ...methodBase,
+        value: function (this: boolean, other: unknown) {
+            const s = Boolean(other);
+            if (this < s) return -1;
+            if (this > s) return 1;
+            return 0;
+        }
     }
 });
+
+// #endregion Boolean augmentations

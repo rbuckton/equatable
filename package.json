@@ -1,27 +1,14 @@
 {
     "name": "equatable",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "A low-level API for defining equality.",
     "main": "index.js",
     "types": "index.d.ts",
-    "scripts": {
-        "build": "gulp"
-    },
     "author": "Ron Buckton (rbuckton@chronicles.org)",
     "license": "Apache-2.0",
     "dependencies": {
-        "collection-core": "^1.0.0"
-    },
-    "devDependencies": {
-        "@types/jest": "^23.3.11",
-        "@types/node": "^11.11.0",
-        "del": "^3.0.0",
-        "gulp": "^4.0.0",
-        "gulp-sourcemaps": "^2.6.4",
-        "gulp-typescript": "^5.0.0",
-        "jest": "^23.6.0",
-        "ts-jest": "^23.10.5",
-        "tslib": "^1.9.3",
-        "typescript": "^3.4.0-dev.20190321"
+        "@esfx/collections": "^1.0.0-pre.2",
+        "@esfx/equatable": "^1.0.0-pre.2",
+        "@esfx/equatable-shim": "^1.0.0-pre.2"
     }
 }

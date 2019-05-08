@@ -1,5 +1,9 @@
 # `equatable`
 
+> NOTE: `equatable` has been deprecated in favor of [`@esfx/equatable`](https://github.com/esfx/esfx/blob/master/packages/equatable#readme),
+> [`@esfx/equatable-shim`](https://github.com/esfx/esfx/blob/master/packages/equatable-shim#readme), and [`@esfx/collections`](https://github.com/esfx/esfx/blob/master/packages/collections#readme).
+> Please update your references.
+
 The `equatable` package provides a low level API for defining equality.
 
 # Installation
@@ -13,7 +17,7 @@ npm i equatable
 ## Basic Usage
 
 ```ts
-import { Equatable, Equaler, Comparable, Comparer } from "equatable"; 
+import { Equatable, Equaler, Comparable, Comparer } from "equatable";
 
 class Person {
     constructor(firstName, lastName) {
@@ -104,7 +108,7 @@ sortedSet.add(obj2);
 
 ## Global Shim
 
-The global shim adds a default implementation of `Equatable` to `Object.prototype` and default implementations of 
+The global shim adds a default implementation of `Equatable` to `Object.prototype` and default implementations of
 `Comparable` to `String.prototype`, `Number.prototype`, `Boolean.prototype`, and `BigInt.prototype`.
 
 To install the global shim, import `equatable/global`:
